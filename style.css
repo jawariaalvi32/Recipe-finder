@@ -14,6 +14,7 @@
 .meal-w {
     width: 280px !important;
     height: 280px !important;
+    margin: 2px !important;
 }
 img {
     text-align: center;
