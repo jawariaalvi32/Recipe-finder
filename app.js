@@ -15,44 +15,30 @@ let searchRecipe = () => {
         console.log(data)
         for (let index = 0; index < data.meals.length; index++) {
             let box = document.createElement('div');
-            box.setAttribute('class','col-md-3 col-sm-6 col-xs-12 box m-1');
+            box.setAttribute('class','col-md-3 col-sm-4 col-xs-12 m-91 text-center');
             box.setAttribute('id',data.meals[index].idMeal);
             let img = document.createElement('img');
             img.setAttribute('src', data.meals[index].strMealThumb)
+            img.setAttribute('class','meal');
             box.appendChild(img);
             searchDiv.appendChild(box);
-            // searchDiv.addEventListener("click", searchRecipeById(data.meals[index].idMeal));
         }
     })
 }
 
-// let searchRecipeById = (e) => {
-
-//     let searchApi = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${e}`
-// console.log(searchApi)
-//     fetch(searchApi).then(api => api.json())
-//     .then((data) => {
-//         console.log(data)
-        
-//     })
-// }
 
 searchDiv.addEventListener('click', e => {
-    console.log(e.path);
+
     const mealInfo = e.path.find(item => {
-        console.log(item.id)
-      if (item.classList) {
-        return item.classList.contains('meal-info');
-      } else {
-        return false;
-      }
+      let apiById = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${item.id}`;
+
+      fetch(apiById).then(api => api.json())
+      .then((data) => {
+        clearDivs();
+        singleMeal(data);
+      })
+
     });
-  
-    if (mealInfo) {
-      const mealID = mealInfo.getAttribute('data-mealid');
-      getMealById(mealID);
-    }
-    
   });
 
 let searchRandom = () => {
@@ -62,40 +48,55 @@ let searchRandom = () => {
 
     fetch(randomApi).then(api => api.json())
     .then((data) => {
-        let h1 = document.createElement('h1');
-        let h1Text = document.createTextNode(data.meals[0].strMeal)
-        h1.appendChild(h1Text);
-        imgr.appendChild(h1)
-
-        let box = document.createElement('div');
-        box.setAttribute('class','col-md-3 box');
-        box.setAttribute('id',data.meals[0].idMeal);
-        let img = document.createElement('img');
-        img.setAttribute('src', data.meals[0].strMealThumb)
-        box.appendChild(img);
-        imgr.appendChild(box);
-
-        let tags = (data.meals[0].strTags == null) ? 0 : data.meals[0].strTags.split(',');
-        for (let index = 0; index < tags.length - 1; index++) {
-            let p = document.createElement('p');
-            let pText = document.createTextNode(tags[index])
-            p.appendChild(pText);
-            mealCategory.appendChild(p)
-        }
-
-        let pInstructions = document.createElement('p');
-        let pInstructionsTxt = document.createTextNode(data.meals[0].strInstructions)
-        pInstructions.appendChild(pInstructionsTxt);
-        mealRecipee.appendChild(pInstructions);
-
-        for (let index = 1; index < 20; index++) {
-            let spIngredients = document.createElement('span');
-            spIngredients.setAttribute('class', 'badge badge-secondary m-2')
-            let pIngredientsTxt = document.createTextNode(data.meals[0][`strIngredient${index}`])
-            spIngredients.appendChild(pIngredientsTxt);
-            mealIngredients.appendChild(spIngredients)
-        }
+      singleMeal(data);
     })
+  }
+
+let singleMeal = (data) => {
+  // Meal Heading
+  let h1 = document.createElement('h1');
+  let h1Text = document.createTextNode(data.meals[0].strMeal)
+  h1.appendChild(h1Text);
+  imgr.appendChild(h1)
+
+  // Meal Image
+  let box = document.createElement('div');
+  box.setAttribute('class','col-md-3');
+  box.setAttribute('id',data.meals[0].idMeal);
+  let img = document.createElement('img');
+  img.setAttribute('src', data.meals[0].strMealThumb)
+  img.setAttribute('class','meal');
+  box.appendChild(img);
+  imgr.appendChild(box);
+
+  // Meal Tags
+  let tags = (data.meals[0].strTags == null) ? 0 : data.meals[0].strTags.split(',');
+  for (let index = 0; index < tags.length - 1; index++) {
+    let p = document.createElement('p');
+    let pText = document.createTextNode(tags[index])
+    p.appendChild(pText);
+    mealCategory.appendChild(p)
+  }
+
+  // Meal Instructions
+  let pInstructions = document.createElement('p');
+  let pInstructionsTxt = document.createTextNode(data.meals[0].strInstructions)
+  pInstructions.appendChild(pInstructionsTxt);
+  mealRecipee.appendChild(pInstructions);
+
+  // Meal Ingredients
+  let h3 = document.createElement('h3');
+  let h3Txt = document.createTextNode('INGREDIENTS');
+  h3.appendChild(h3Txt);
+  mealIngredients.appendChild(h3);
+  for (let index = 1; index < 20; index++) {
+     let ingrImg = `https://www.themealdb.com/images/ingredients/${data.meals[0][`strIngredient${index}`]}-Small.png`;
+    if (data.meals[0][`strIngredient${index}`]) {
+      let imgtag = document.createElement('img');
+      imgtag.setAttribute('src', ingrImg)
+      mealIngredients.appendChild(imgtag);
+    }
+  }
 }
 
 let clearDivs = () => {
